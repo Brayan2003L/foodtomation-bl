@@ -617,3 +617,66 @@ button { font: inherit; color: inherit; }
   padding: 12px 12px 12px 16px; border-radius: 14px; background: var(--m-text); color: #fff; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.3);
 }
 .m-toast button { height: 40px; padding: 0 14px; border: none; border-radius: 10px; background: rgba(255,255,255,.15); color: #fff; font-weight: 800; }
+
+/* ═════════════════════════════════════════════════════════════
+   VENTANAS MODALES (patrón "modal dialog")
+   ═════════════════════════════════════════════════════════════ */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 24px;
+  background: rgba(17, 12, 6, .55); backdrop-filter: blur(2px); animation: modal-fade .18s ease-out both;
+}
+.modal {
+  width: min(520px, 100%); background: #fff; color: #1A1108; border-radius: 24px; padding: 32px 32px 24px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.35); animation: modal-pop .22s cubic-bezier(.2,1.2,.4,1) both;
+  font-family: 'Inter', sans-serif;
+}
+.modal-title { margin: 0 0 12px; font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 1.9rem; line-height: 1.15; }
+.modal-body { font-size: 1.05rem; line-height: 1.55; color: #4B443B; }
+.modal-body p { margin: 0 0 10px; }
+.modal-actions { display: flex; gap: 12px; margin-top: 22px; }
+.modal-btn { flex: 1; height: 64px; border-radius: 16px; font-size: 1.05rem; font-weight: 800; cursor: pointer; }
+.modal-cancel { background: #fff; border: 1.5px solid #EAE5DE; color: #1A1108; }
+.modal-confirm { background: #C44B1A; border: none; color: #fff; }
+.modal-confirm:active { background: #A33A14; }
+.modal-caja .modal { border-radius: 18px; }
+.modal-caja .modal-title { font-size: 1.6rem; }
+.modal-caja .modal-btn { height: 54px; border-radius: 12px; font-size: 1rem; }
+.modal-caja .modal-confirm { background: #0F766E; }
+.modal-caja .modal-cancel { border-color: #E5E7EB; }
+.modal-summary { margin: 4px 0 14px; padding: 12px 16px; border-radius: 12px; background: #F3F4F6; }
+.modal-summary > div { display: flex; justify-content: space-between; padding: 4px 0; }
+.modal-summary dt { color: #6B7280; }
+.modal-summary dd { margin: 0; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #111827; }
+.modal-summary .is-total { border-top: 1px solid #E5E7EB; margin-top: 4px; padding-top: 8px; }
+.modal-summary .is-total dd { font-size: 1.3rem; }
+.modal-warn { color: #92400E; font-weight: 700; }
+@keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-pop { from { transform: translateY(14px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Franja de estado del pedido en el menú (recomendación 2) */
+.k-statusbar {
+  flex-shrink: 0; display: flex; align-items: center; gap: 24px; width: 100%; padding: 12px 32px; text-align: left;
+  border: none; border-bottom: 1px solid #DBEAFE; background: #EFF6FF; color: #1E3A8A; cursor: pointer; font: inherit;
+}
+.k-statusbar.is-ready { background: #EAF6EF; border-bottom-color: #BBE5C9; color: #2F7D4F; }
+.k-statusbar-item { display: flex; align-items: center; gap: 12px; }
+.k-statusbar-id { font-weight: 800; font-size: .95rem; }
+.k-statusbar-dots { display: flex; gap: 4px; }
+.k-statusbar-dots i { width: 22px; height: 6px; border-radius: 3px; background: rgba(30,58,138,.18); }
+.k-statusbar-dots i.is-on { background: currentColor; }
+.k-statusbar-text { font-size: .95rem; font-weight: 600; }
+.k-statusbar-link { margin-left: auto; font-weight: 800; font-size: .95rem; white-space: nowrap; }
+
+/* Caja: filtro de cierres por método de pago (recomendación 5) */
+.c-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.c-filter-chip { padding: 6px 10px; border-radius: 999px; border: 1px solid var(--c-rule); background: var(--c-surface); font-size: .8rem; font-weight: 700; color: var(--c-text); }
+.c-filter-chip span { margin-left: 4px; color: var(--c-sub); }
+.c-filter-chip.is-on { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
+.c-filter-chip.is-on span { color: rgba(255,255,255,.8); }
+.c-filter-total { display: flex; justify-content: space-between; padding: 6px 4px 8px; font-size: .85rem; color: var(--c-sub); }
+.c-filter-total strong { font-family: 'JetBrains Mono', monospace; color: var(--c-text); }
+
+/* Mesero: botón de sonido (recomendación 4) */
+.m-header-actions { display: flex; align-items: center; gap: 8px; }
+.m-sound { padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.25); background: transparent; color: #CBD5E1; font-size: .78rem; font-weight: 700; }
+.m-sound.is-on { background: rgba(255,255,255,.12); color: #fff; }

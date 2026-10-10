@@ -24,6 +24,15 @@ export function MenuScreen({
   const mine = tableOrders(orders, table, billRequests)
   const activeOrders = mine.filter(o => o.status !== 'entregado').length
   const hasReady = mine.some(o => o.status === 'listo')
+  // Recomendación 2 de la evaluación: el estado del pedido visible en el menú.
+  const tracked = mine.filter(o => o.status !== 'entregado')
+  const STATUS_TEXT = {
+    en_cola: 'Recibido en cocina, en cola',
+    en_preparacion: 'En preparación',
+    listo: '¡Listo! Un mesero lo lleva a tu mesa',
+    entregado: 'Entregado',
+  } as const
+  const STEP = { en_cola: 1, en_preparacion: 2, listo: 3, entregado: 4 } as const
   const items = MENU.filter(i => i.categoryId === categoryId)
   const category = CATEGORIES.find(c => c.id === categoryId)
   const gridRef = useRef<HTMLDivElement>(null)
@@ -76,6 +85,21 @@ export function MenuScreen({
           </button>
         ))}
       </nav>
+
+      {tracked.length > 0 && (
+        <button type="button" className={`k-statusbar ${hasReady ? 'is-ready' : ''}`} onClick={onOrders}>
+          {tracked.slice(0, 2).map(o => (
+            <span key={o.id} className="k-statusbar-item">
+              <span className="k-statusbar-id">Pedido #{o.id}</span>
+              <span className="k-statusbar-dots" aria-hidden>
+                {[1, 2, 3, 4].map(n => <i key={n} className={n <= STEP[o.status] ? 'is-on' : ''} />)}
+              </span>
+              <span className="k-statusbar-text">{STATUS_TEXT[o.status]}</span>
+            </span>
+          ))}
+          <span className="k-statusbar-link">Ver detalle →</span>
+        </button>
+      )}
 
       <main className="k-menu-scroll" ref={gridRef}>
         <div className="k-section-head">

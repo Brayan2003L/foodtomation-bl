@@ -5,6 +5,7 @@ import type { Order } from '../../domain/types'
 import { useCart } from '../../state/CartContext'
 import { useOrders } from '../../state/OrdersContext'
 import { BackButton, DishImage, Stepper } from './shared'
+import { Modal } from '../shared/Modal'
 
 export function CheckoutScreen({
   onBack,
@@ -16,6 +17,7 @@ export function CheckoutScreen({
   const { table, lines, count, total, setQty, remove, clear } = useCart()
   const { submitOrder } = useOrders()
   const [sending, setSending] = useState(false)
+  const [confirming, setConfirming] = useState(false)
 
   const send = () => {
     if (!lines.length || sending) return
@@ -99,7 +101,7 @@ export function CheckoutScreen({
             <p className="k-summary-note">
               Revisa tu pedido antes de enviarlo. Irá directo a la cocina y podrás pagar al finalizar.
             </p>
-            <button type="button" className="k-send-btn" onClick={send} disabled={sending}>
+            <button type="button" className="k-send-btn" onClick={() => setConfirming(true)} disabled={sending}>
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path d="M4 12l16-8-6 16-2.5-6.5L4 12z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
               </svg>
@@ -108,6 +110,20 @@ export function CheckoutScreen({
           </aside>
         </div>
       )}
+      <Modal
+        open={confirming}
+        title="¿Enviar tu pedido a la cocina?"
+        confirmLabel="Sí, enviar a cocina"
+        cancelLabel="Revisar pedido"
+        onCancel={() => setConfirming(false)}
+        onConfirm={() => { setConfirming(false); send() }}
+      >
+        <p>
+          Vas a enviar <strong>{count} {count === 1 ? 'producto' : 'productos'}</strong> por un total de{' '}
+          <strong>{formatPrice(total)}</strong>.
+        </p>
+        <p>Una vez enviado, la cocina empezará a prepararlo y no podrás modificarlo desde la tablet.</p>
+      </Modal>
     </div>
   )
 }

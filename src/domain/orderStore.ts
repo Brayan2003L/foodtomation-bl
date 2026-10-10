@@ -38,7 +38,7 @@ export interface StoreState {
   settlements: Settlement[]
 }
 
-const STORAGE_KEY = 'foodtomation:orders:v4'
+const STORAGE_KEY = 'foodtomation:orders:v5'
 
 function safeRead(): StoreState | null {
   try {
@@ -69,7 +69,7 @@ function seed(now: number): StoreState {
     ({ id, table, createdAt: now - agoMin * min, lines, total: linesTotal(lines), status, ...extra })
 
   const paidEarlier = o(98, 'Mesa 01', 95, 'entregado', [
-    L(2, 'Pizza margarita', 'caliente'), L(2, 'Jugo natural', 'barra'),
+    L(2, 'Pizza hawaiana', 'caliente'), L(2, 'Jugo natural', 'barra'),
   ], { startedAt: now - 92 * min, readyAt: now - 80 * min, deliveredAt: now - 78 * min, paidAt: now - 35 * min })
 
   return {
@@ -82,18 +82,18 @@ function seed(now: number): StoreState {
     orders: [
       paidEarlier,
       o(99, 'Mesa 05', 42, 'entregado', [
-        L(2, 'Costilla de res', 'caliente', ['Término medio']), L(1, 'Ensalada de la casa', 'frio'), L(2, 'Limonada de coco', 'barra'),
+        L(2, 'Costillas BBQ', 'caliente', []), L(1, 'Ensalada de la casa', 'frio'), L(2, 'Limonada de coco', 'barra'),
       ], { startedAt: now - 40 * min, readyAt: now - 25 * min, deliveredAt: now - 22 * min }),
       o(100, 'Mesa 03', 18, 'listo', [
         L(2, 'Brochetas a la parrilla', 'caliente'),
       ], { startedAt: now - 16 * min, readyAt: now - 2 * min }),
       o(101, 'Mesa 07', 13, 'en_preparacion', [
         L(1, 'Tartar de atún', 'frio', ['Sin ajonjolí']),
-        L(2, 'Costilla de res', 'caliente', ['Término medio'], 'Alergia a los mariscos'),
+        L(2, 'Costillas BBQ', 'caliente', ['Salsa BBQ aparte'], 'Alergia a los mariscos'),
       ], { startedAt: now - 10 * min }),
       o(102, 'Mesa 11', 8, 'en_preparacion', [
-        L(2, 'Pasta al pomodoro', 'caliente', ['Sin gluten'], 'Celíaco, usar utensilios aparte'),
-        L(1, 'Pizza margarita', 'caliente'),
+        L(2, 'Pasta al pesto', 'caliente', ['Sin gluten'], 'Celíaco, usar utensilios aparte'),
+        L(1, 'Pizza hawaiana', 'caliente'),
       ], { startedAt: now - 5 * min }),
       o(103, 'Mesa 02', 4, 'en_cola', [
         L(3, 'Hamburguesa de la casa', 'caliente', ['Sin cebolla']), L(3, 'Limonada de coco', 'barra'),

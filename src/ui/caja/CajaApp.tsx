@@ -7,6 +7,7 @@ import type { OpenTable } from '../../domain/orderStore'
 import { formatPrice } from '../../domain/pricing'
 import type { Order, PaymentMethod, Settlement } from '../../domain/types'
 import { useOrders } from '../../state/OrdersContext'
+import { Modal } from '../shared/Modal'
 
 const TIP_RATE = 0.1
 
@@ -40,6 +41,7 @@ export function CajaApp() {
   const now = useNow()
   const [selected, setSelected] = useState<string | null>(null)
   const [toast, setToast] = useState<Settlement | null>(null)
+  const [filter, setFilter] = useState<PaymentMethod | 'todos'>('todos')
 
   // Mantener una mesa seleccionada: la elegida si sigue abierta, si no la primera de la lista.
   useEffect(() => {
@@ -54,6 +56,7 @@ export function CajaApp() {
 
   const startOfDay = new Date(now).setHours(0, 0, 0, 0)
   const today = settlements.filter(s => s.paidAt >= startOfDay)
+  const filtered = filter === 'todos' ? today : today.filter(s => s.method === filter)
   const salesToday = round2(today.reduce((a, s) => a + s.total, 0))
   const requests = tables.filter(t => t.billRequestedAt).length
   const current = tables.find(t => t.key === selected) ?? null
@@ -85,7 +88,21 @@ export function CajaApp() {
           {today.length > 0 && (
             <>
               <div className="c-section-title c-mt">Cierres de hoy</div>
-              {[...today].reverse().slice(0, 6).map(s => (
+              <div className="c-filter" role="group" aria-label="Filtrar por método de pago">
+                {[{ id: 'todos' as const, label: 'Todos' }, ...METHODS].map(m => {
+                  const list = m.id === 'todos' ? today : today.filter(s => s.method === m.id)
+                  return (
+                    <button key={m.id} type="button" className={`c-filter-chip ${filter === m.id ? 'is-on' : ''}`} onClick={() => setFilter(m.id)}>
+                      {m.label} <span>{list.length}</span>
+                    </button>
+                  )
+                })}
+              </div>
+              <div className="c-filter-total">
+                <span>Subtotal {filter === 'todos' ? 'del día' : METHODS.find(m => m.id === filter)?.label.toLowerCase()}</span>
+                <strong>{formatPrice(round2(filtered.reduce((a, s) => a + s.total, 0)))}</strong>
+              </div>
+              {[...filtered].reverse().slice(0, 6).map(s => (
                 <div key={s.id} className="c-closed">
                   <span className="c-closed-table">{s.table}</span>
                   <span className="c-closed-meta">{hhmm(s.paidAt)} · {METHODS.find(m => m.id === s.method)?.label}</span>
@@ -166,6 +183,7 @@ function TableDetail({ t, now, onSettled }: { t: OpenTable; now: number; onSettl
   const [method, setMethod] = useState<PaymentMethod>('tarjeta')
   const [received, setReceived] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [confirming, setConfirming] = useState(false)
 
   const tip = withTip ? round2(t.subtotal * TIP_RATE) : 0
   const total = round2(t.subtotal + tip)
@@ -272,9 +290,27 @@ function TableDetail({ t, now, onSettled }: { t: OpenTable; now: number; onSettl
 
         {error && <div className="c-error">{error}</div>}
 
-        <button type="button" className="c-pay-btn" disabled={!cashOk} onClick={pay}>
+        <button type="button" className="c-pay-btn" disabled={!cashOk} onClick={() => setConfirming(true)}>
           Cobrar {formatPrice(total)} y cerrar cuenta
         </button>
+        <Modal
+          open={confirming}
+          tone="caja"
+          title={`Confirmar cobro de la ${t.table}`}
+          confirmLabel={`Cobrar ${formatPrice(total)}`}
+          onCancel={() => setConfirming(false)}
+          onConfirm={() => { setConfirming(false); pay() }}
+        >
+          <dl className="modal-summary">
+            <div><dt>Subtotal</dt><dd>{formatPrice(t.subtotal)}</dd></div>
+            {tip > 0 && <div><dt>Propina voluntaria</dt><dd>{formatPrice(tip)}</dd></div>}
+            <div className="is-total"><dt>Total</dt><dd>{formatPrice(total)}</dd></div>
+            <div><dt>Medio de pago</dt><dd>{METHODS.find(m => m.id === method)?.label}</dd></div>
+            {method === 'efectivo' && <div><dt>Cambio a entregar</dt><dd>{formatPrice(Math.max(0, change))}</dd></div>}
+          </dl>
+          {t.pending > 0 && <p className="modal-warn">⚠ Esta cuenta tiene pedidos sin entregar.</p>}
+          <p>Al confirmar, la cuenta se cierra y la mesa queda libre.</p>
+        </Modal>
         <p className="c-footnote">Cierre operativo de la cuenta. La factura electrónica se emite en el sistema contable del restaurante.</p>
       </aside>
     </div>

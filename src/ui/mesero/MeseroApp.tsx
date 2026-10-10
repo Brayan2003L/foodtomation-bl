@@ -32,12 +32,43 @@ function buzz() {
   }
 }
 
+// Recomendación 4 de la evaluación: el aviso de plato listo debe sonar.
+// Los navegadores solo permiten reproducir audio después de un toque del
+// usuario, por eso el sonido se activa con el botón de la campana.
+let audioCtx: AudioContext | null = null
+function unlockAudio(): boolean {
+  try {
+    audioCtx = audioCtx ?? new AudioContext()
+    void audioCtx.resume()
+    return true
+  } catch {
+    return false
+  }
+}
+function chime() {
+  if (!audioCtx || audioCtx.state !== 'running') return
+  const now = audioCtx.currentTime
+  ;[0, 0.18].forEach((offset, i) => {
+    const osc = audioCtx!.createOscillator()
+    const gain = audioCtx!.createGain()
+    osc.type = 'sine'
+    osc.frequency.value = i === 0 ? 880 : 1175
+    gain.gain.setValueAtTime(0.0001, now + offset)
+    gain.gain.exponentialRampToValueAtTime(0.35, now + offset + 0.02)
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.32)
+    osc.connect(gain).connect(audioCtx!.destination)
+    osc.start(now + offset)
+    osc.stop(now + offset + 0.35)
+  })
+}
+
 export function MeseroApp() {
   const { ready, kitchen, tables, confirmDelivery, revertDelivery } = useOrders()
   const now = useNow()
   const [tab, setTab] = useState<Tab>('entregar')
   const [alert, setAlert] = useState<Order | null>(null)
   const [undo, setUndo] = useState<Order | null>(null)
+  const [sound, setSound] = useState(false)
   const seen = useRef<Set<number> | null>(null)
 
   // Observa los pedidos listos y avisa cuando aparece uno nuevo.
@@ -48,10 +79,11 @@ export function MeseroApp() {
       if (fresh) {
         setAlert(fresh)
         buzz()
+        if (sound) chime()
       }
     }
     seen.current = ids
-  }, [ready])
+  }, [ready, sound])
 
   useEffect(() => {
     if (!alert) return
@@ -85,8 +117,23 @@ export function MeseroApp() {
             <div className="m-brand-role">Mesero</div>
           </div>
         </div>
-        <div className={`m-bell ${ready.length ? 'is-on' : ''}`} aria-label={`${ready.length} platos listos`}>
-          🔔<span>{ready.length}</span>
+        <div className="m-header-actions">
+          <button
+            type="button"
+            className={`m-sound ${sound ? 'is-on' : ''}`}
+            aria-pressed={sound}
+            onClick={() => {
+              if (!sound && unlockAudio()) {
+                setSound(true)
+                chime()
+              } else setSound(false)
+            }}
+          >
+            {sound ? '🔊 Sonido' : '🔇 Activar sonido'}
+          </button>
+          <div className={`m-bell ${ready.length ? 'is-on' : ''}`} aria-label={`${ready.length} platos listos`}>
+            🔔<span>{ready.length}</span>
+          </div>
         </div>
       </header>
 

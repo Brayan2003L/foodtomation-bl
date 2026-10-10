@@ -1,7 +1,8 @@
 import type { Category, MenuItem } from './types'
 
-const img = (id: string) =>
-  `https://images.unsplash.com/photo-${id}?w=900&h=700&fit=crop&auto=format`
+// Fotografías de Unsplash (licencia libre), incluidas en /public/img para
+// que el prototipo no dependa de un servicio externo.
+const img = (name: string) => `${import.meta.env.BASE_URL}img/${name}.jpg`
 
 export const CATEGORIES: Category[] = [
   { id: 'entradas', label: 'Entradas' },
@@ -19,7 +20,7 @@ export const MENU: MenuItem[] = [
     id: 'ensalada-casa', categoryId: 'entradas', station: 'frio',
     name: 'Ensalada de la casa',
     description: 'Hojas verdes, aguacate, quinoa, tomate cherry y vinagreta de maracuyá.',
-    price: 14, image: img('1512621776951-a57141f2eefd'),
+    price: 14, image: img('ensalada-casa'),
     modifiers: [
       { id: 'sin-cebolla', label: 'Sin cebolla' },
       { id: 'aderezo-aparte', label: 'Aderezo aparte' },
@@ -30,7 +31,7 @@ export const MENU: MenuItem[] = [
     id: 'brochetas', categoryId: 'entradas', station: 'caliente',
     name: 'Brochetas a la parrilla',
     description: 'Res y pimentón asados al carbón con chimichurri de la casa.',
-    price: 16, image: img('1555939594-58d7cb561ad1'),
+    price: 16, image: img('brochetas'),
     modifiers: [
       { id: 'sin-picante', label: 'Sin picante' },
       { id: 'salsa-aparte', label: 'Salsa aparte' },
@@ -50,35 +51,35 @@ export const MENU: MenuItem[] = [
 
   // ── Platos fuertes ─────────────────────────────────────────
   {
-    id: 'confit-pato', categoryId: 'fuertes', station: 'caliente',
-    name: 'Confit de pato',
-    description: 'Muslo de pato confitado, reducción de cereza y oporto, papas criollas asadas, espinaca y chalotas crocantes.',
-    price: 34, image: img('1544025162-d76694265947'),
-    modifiers: [
-      { id: 'sin-salsa', label: 'Sin salsa' },
-      { id: 'extra-veg', label: 'Vegetales extra' },
-      { id: 'sin-papa', label: 'Sin papa' },
-      { id: 'bien-cocido', label: 'Bien cocido' },
-      COMMON_ALLERGY,
-      { id: 'add-foie', label: 'Agregar foie gras', surcharge: 12 },
-    ],
-  },
-  {
-    id: 'costilla', categoryId: 'fuertes', station: 'caliente',
-    name: 'Costilla de res',
-    description: 'Cocción lenta por 12 horas, puré de papa rústico y vegetales glaseados.',
-    price: 32, image: img('1504674900247-0877df9cc836'),
+    id: 'lomo-res', categoryId: 'fuertes', station: 'caliente',
+    name: 'Lomo de res a la parrilla',
+    description: 'Lomo fino en tajadas, ensalada de hojas verdes, chiles frescos y salsa de la casa.',
+    price: 34, image: img('lomo-res'),
     modifiers: [
       { id: 'termino-medio', label: 'Término medio' },
       { id: 'bien-cocido', label: 'Bien cocido' },
-      { id: 'sin-pure', label: 'Cambiar puré por ensalada' },
+      { id: 'sin-picante', label: 'Sin picante' },
+      { id: 'salsa-aparte', label: 'Salsa aparte' },
+      COMMON_ALLERGY,
+      { id: 'add-papas', label: 'Agregar papas criollas', surcharge: 4 },
+    ],
+  },
+  {
+    id: 'costillas-bbq', categoryId: 'fuertes', station: 'caliente',
+    name: 'Costillas BBQ',
+    description: 'Costillas de cerdo en cocción lenta, glaseadas con salsa BBQ, tomate fresco y papas a la francesa.',
+    price: 32, image: img('costillas-bbq'),
+    modifiers: [
+      { id: 'salsa-aparte', label: 'Salsa BBQ aparte' },
+      { id: 'sin-papas', label: 'Cambiar papas por ensalada' },
+      { id: 'extra-salsa', label: 'Extra salsa', surcharge: 2 },
     ],
   },
   {
     id: 'hamburguesa', categoryId: 'fuertes', station: 'caliente',
     name: 'Hamburguesa de la casa',
     description: 'Carne angus de 200 g, queso cheddar madurado, tocineta y papas rústicas.',
-    price: 22, image: img('1568901346375-23c9450c58cd'),
+    price: 22, image: img('hamburguesa'),
     modifiers: [
       { id: 'sin-cebolla', label: 'Sin cebolla' },
       { id: 'sin-tocineta', label: 'Sin tocineta' },
@@ -91,7 +92,7 @@ export const MENU: MenuItem[] = [
     id: 'bowl-pollo', categoryId: 'fuertes', station: 'frio',
     name: 'Bowl de pollo',
     description: 'Pollo a la plancha, arroz integral, garbanzos, vegetales frescos y hummus.',
-    price: 19, image: img('1546069901-ba9599a7e63c'),
+    price: 19, image: img('bowl-pollo'),
     modifiers: [
       { id: 'sin-hummus', label: 'Sin hummus' },
       { id: 'vegano', label: 'Versión vegana (tofu)' },
@@ -101,21 +102,22 @@ export const MENU: MenuItem[] = [
 
   // ── Pastas y pizzas ────────────────────────────────────────
   {
-    id: 'pizza-margarita', categoryId: 'pastas', station: 'caliente',
-    name: 'Pizza margarita',
-    description: 'Masa madre, tomate San Marzano, mozzarella fresca y albahaca.',
-    price: 21, image: img('1565299624946-b28f40a0ae38'),
+    id: 'pizza-hawaiana', categoryId: 'pastas', station: 'caliente',
+    name: 'Pizza hawaiana',
+    description: 'Masa madre, salsa de tomate, mozzarella, jamón, piña asada y cebolla morada.',
+    price: 21, image: img('pizza-hawaiana'),
     modifiers: [
+      { id: 'sin-pina', label: 'Sin piña' },
+      { id: 'sin-cebolla', label: 'Sin cebolla' },
       { id: 'extra-queso', label: 'Extra queso', surcharge: 3 },
-      { id: 'sin-albahaca', label: 'Sin albahaca' },
       COMMON_ALLERGY,
     ],
   },
   {
-    id: 'pasta-pomodoro', categoryId: 'pastas', station: 'caliente',
-    name: 'Pasta al pomodoro',
-    description: 'Spaghetti, salsa de tomate de cocción lenta, parmesano y aceite de oliva.',
-    price: 20, image: img('1473093295043-cdd812d0e601'),
+    id: 'pasta-pesto', categoryId: 'pastas', station: 'caliente',
+    name: 'Pasta al pesto',
+    description: 'Farfalle con pesto de albahaca, tomate cherry y hojas de rúgula.',
+    price: 20, image: img('pasta-pesto'),
     modifiers: [
       { id: 'sin-queso', label: 'Sin queso' },
       COMMON_ALLERGY,
@@ -128,7 +130,7 @@ export const MENU: MenuItem[] = [
     id: 'pancakes', categoryId: 'postres', station: 'frio',
     name: 'Pancakes de la casa',
     description: 'Torre de pancakes, frutos rojos, miel de maple y mantequilla batida.',
-    price: 12, image: img('1567620905732-2d1ec7ab7445'),
+    price: 12, image: img('pancakes'),
     modifiers: [
       { id: 'sin-mantequilla', label: 'Sin mantequilla' },
       { id: 'add-helado', label: 'Agregar helado', surcharge: 3 },
